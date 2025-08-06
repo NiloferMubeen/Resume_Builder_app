@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload Resume - Resume Builder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'primary-25': '#f8fafc',
+            'primary-50': '#f1f5f9',
+            'primary-800': '#1e293b'
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'pulse-glow': 'pulse-glow 3s ease-in-out infinite alternate',
+            'shimmer': 'shimmer 2s linear infinite',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Animate.css for animation effects -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  
+  <!-- PDF.js for PDF rendering -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <style>
+    /* Glassmorphism and modern effects */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    .upload-zone {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(20px);
+      border: 2px dashed rgba(59, 130, 246, 0.3);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .upload-zone.dragover {
+      border-color: rgba(59, 130, 246, 0.6);
+      background: rgba(59, 130, 246, 0.05);
+      transform: scale(1.02);
+    }
+
+    .upload-zone:hover {
+      border-color: rgba(59, 130, 246, 0.5);
+      background: rgba(59, 130, 246, 0.03);
+    }
+
+    /* PDF Preview styles */
+    .pdf-preview {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.1),
+        0 8px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    .pdf-canvas {
+      max-width: 100%;
+      height: auto;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Modern button styles */
+    .modern-btn {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      box-shadow: 
+        0 10px 20px rgba(59, 130, 246, 0.3),
+        0 4px 8px rgba(59, 130, 246, 0.2);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .modern-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .modern-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        0 15px 30px rgba(59, 130, 246, 0.4),
+        0 6px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .modern-btn:hover::before {
+      left: 100%;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #64748b, #475569);
+      box-shadow: 
+        0 10px 20px rgba(100, 116, 139, 0.3),
+        0 4px 8px rgba(100, 116, 139, 0.2);
+    }
+
+    .btn-secondary:hover {
+      box-shadow: 
+        0 15px 30px rgba(100, 116, 139, 0.4),
+        0 6px 12px rgba(100, 116, 139, 0.3);
+    }
+
+    /* Loading animation */
+    @keyframes shimmer {
+      0% {
+        background-position: -200% center;
+      }
+      100% {
+        background-position: 200% center;
+      }
+    }
+
+    .loading-shimmer {
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0.1) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 2s infinite;
+    }
+
+    /* Floating elements animation */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      25% { transform: translateY(-10px) rotate(1deg); }
+      50% { transform: translateY(-20px) rotate(0deg); }
+      75% { transform: translateY(-10px) rotate(-1deg); }
+    }
+
+    .float-animation {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    /* Enhanced navbar */
+    .navbar-glass {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Gradient text */
+    .gradient-text {
+      background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 30%, #06b6d4 60%, #10b981 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-size: 300% 300%;
+      animation: gradient-shift 6s ease infinite;
+    }
+
+    @keyframes gradient-shift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    /* File upload progress */
+    .upload-progress {
+      height: 4px;
+      background: rgba(59, 130, 246, 0.2);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .upload-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+
+    /* Error and success states */
+    .upload-error {
+      border-color: rgba(239, 68, 68, 0.5) !important;
+      background: rgba(239, 68, 68, 0.05) !important;
+    }
+
+    .upload-success {
+      border-color: rgba(34, 197, 94, 0.5) !important;
+      background: rgba(34, 197, 94, 0.05) !important;
+    }
+
+    /* PDF navigation */
+    .pdf-nav {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border-radius: 2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 overflow-x-hidden">
+
+  <!-- Navbar -->
+  <nav class="navbar-glass sticky top-0 z-50">
+    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+      <a href="/" class="flex items-center space-x-3">
+        <img src="https://www.guvi.in/assets/CPYoUJqK-guvilogo-hcl.webp" class="h-10 w-auto" alt="Guvi Logo" />
+      </a>
+
+      <div class="flex items-center space-x-6">
+        <a href="/" class="text-gray-600 hover:text-blue-600 transition-colors">← Back to Home</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Background decorative elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl float-animation"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-400/10 rounded-full blur-3xl float-animation" style="animation-delay: 2s;"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="relative max-w-screen-xl mx-auto px-4 py-12">
+    
+    <!-- Header -->
+    <div class="text-center mb-12 animate__animated animate__fadeInUp">
+      <h1 class="text-4xl lg:text-5xl font-bold mb-4">
+        Upload Your <span class="gradient-text">Resume</span>
+      </h1>
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+        Upload your existing resume to enhance it with AI-powered improvements and ATS optimization
+      </p>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-12 items-start">
+      
+      <!-- Left Side - Upload Section -->
+      <div class="space-y-8 animate__animated animate__fadeInLeft">
+        
+        <!-- Upload Zone -->
+        <div class="glass-card rounded-3xl p-8">
+          <h2 class="text-2xl font-semibold mb-6 text-center">Upload Resume</h2>
+          
+          <div class="upload-zone rounded-2xl p-8 text-center" id="uploadZone">
+            <div class="mb-4">
+              <svg class="w-16 h-16 mx-auto text-blue-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+            </div>
+            
+            <h3 class="text-lg font-semibold mb-2">Drop your resume here</h3>
+            <p class="text-gray-600 mb-4">or click to browse files</p>
+            <p class="text-sm text-gray-500 mb-6">Supports PDF, DOC, DOCX (Max 10MB)</p>
+            
+            <input type="file" id="resumeUpload" class="hidden" accept=".pdf,.doc,.docx" />
+            <button onclick="document.getElementById('resumeUpload').click()" class="modern-btn text-white px-6 py-3 rounded-xl font-semibold">
+              Choose File
+            </button>
+          </div>
+
+          <!-- Upload Progress -->
+          <div class="upload-progress mt-4 hidden" id="uploadProgress">
+            <div class="upload-progress-bar" id="uploadProgressBar" style="width: 0%"></div>
+          </div>
+
+          <!-- Upload Status -->
+          <div class="mt-4 text-center hidden" id="uploadStatus">
+            <p class="text-sm"></p>
+          </div>
+        </div>
+
+        <!-- File Info -->
+        <div class="glass-card rounded-3xl p-6 hidden" id="fileInfo">
+          <h3 class="text-lg font-semibold mb-4">Uploaded File</h3>
+          <div class="flex items-center space-x-4">
+            <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="flex-1">
+              <p class="font-medium" id="fileName"></p>
+              <p class="text-sm text-gray-500" id="fileSize"></p>
+            </div>
+            <button onclick="removeFile()" class="text-red-500 hover:text-red-700">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="space-y-4 hidden" id="actionButtons">
+          <!-- Edit Resume -->
+          <a href="/build-resume?from_upload=true">
+            <button class="modern-btn w-full text-white py-4 rounded-xl font-semibold text-lg bg-blue-600 hover:bg-blue-700">
+              Edit Resume
+              <svg class="w-5 h-5 inline-block ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5h2M12 7v12m-7-4h10" />
+              </svg>
+            </button>
+          </a>
+          <button onclick="enhanceResume()" class="modern-btn w-full text-white py-4 rounded-xl font-semibold text-lg">
+            Enhance Resume
+            <svg class="w-5 h-5 inline-block ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </button>
+          
+          <button onclick="checkATSScore()" class="btn-secondary modern-btn w-full text-white py-4 rounded-xl font-semibold text-lg">
+            Check ATS Score
+            <svg class="w-5 h-5 inline-block ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Side - Preview Section -->
+      <div class="animate__animated animate__fadeInRight">
+        <div class="glass-card rounded-3xl p-8">
+          <h2 class="text-2xl font-semibold mb-6 text-center">Resume Preview</h2>
+          
+          <!-- Preview Container -->
+          <div class="pdf-preview rounded-2xl p-6 min-h-[600px] flex items-center justify-center" id="previewContainer">
+            <div class="text-center text-gray-500">
+              <svg class="w-24 h-24 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <p class="text-lg">Upload a resume to see preview</p>
+              <p class="text-sm text-gray-400 mt-2">PDF files will be displayed here</p>
+            </div>
+          </div>
+
+          <!-- PDF Navigation -->
+          <div class="pdf-nav hidden mt-6 p-3 flex items-center justify-between" id="pdfNavigation">
+            <button onclick="previousPage()" class="flex items-center space-x-2 px-4 py-2 rounded-xl hover:bg-gray-100 transition-colors" id="prevBtn">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>Previous</span>
+            </button>
+            
+            <div class="flex items-center space-x-2">
+              <span class="text-sm">Page</span>
+              <input type="number" id="pageInput" class="w-16 px-2 py-1 text-center border rounded" min="1" onchange="goToPage(this.value)">
+              <span class="text-sm">of <span id="totalPages">1</span></span>
+            </div>
+            
+            <button onclick="nextPage()" class="flex items-center space-x-2 px-4 py-2 rounded-xl hover:bg-gray-100 transition-colors" id="nextBtn">
+              <span>Next</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global variables for PDF handling
+    let pdfDoc = null;
+    let currentPage = 1;
+    let totalPages = 0;
+    let currentFile = null;
+
+    // Set up PDF.js worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    // Initialize drag and drop functionality
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('resumeUpload');
+
+    // Drag and drop events
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.classList.add('dragover');
+    });
+
+    uploadZone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragover');
+    });
+
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragover');
+      
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFileUpload(files[0]);
+      }
+    });
+
+    // File input change event
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFileUpload(e.target.files[0]);
+      }
+    });
+
+    function handleFileUpload(file) {
+    // Validate file type
+    const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!allowedTypes.includes(file.type)) {
+      showUploadError('Please upload a PDF, DOC, or DOCX file.');
+      return;
+    }
+
+    // Validate file size (10MB max)
+    if (file.size > 10 * 1024 * 1024) {
+      showUploadError('File size must be less than 10MB.');
+      return;
+    }
+
+    currentFile = file;
+    
+    // Actually upload the file to server
+    uploadFileToServer(file);
+  
+  
+  }
+  function uploadFileToServer(file) {
+    showUploadProgress();
+    
+    const formData = new FormData();
+    formData.append('resume', file);
+    
+    fetch('/upload', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+      return response.json();
+    })
+    .then(data => {
+      // Update currentFile object with the secured filename
+      currentFile.savedName = data.filename;
+      
+      // Display file info
+      displayFileInfo(file);
+      
+      // Process file based on type for preview
+      if (file.type === 'application/pdf') {
+        processPDF(file);
+      } else {
+        showDocPreview();
+      }
+      
+      showUploadSuccess();
+    })
+    .catch(error => {
+      console.error('Upload error:', error);
+      showUploadError('Upload failed. Please try again.');
+    });
+  }
+
+
+  // Show upload progress
+  function showUploadProgress() {
+      const progressContainer = document.getElementById('uploadProgress');
+      const progressBar = document.getElementById('uploadProgressBar');
+      
+      progressContainer.classList.remove('hidden');
+      
+      // Simulate upload progress
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += Math.random() * 30;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+          setTimeout(() => {
+            progressContainer.classList.add('hidden');
+            showUploadSuccess();
+          }, 500);
+        }
+        progressBar.style.width = progress + '%';
+      }, 200);
+  }
+
+  // Show upload success
+  function showUploadSuccess() {
+      uploadZone.classList.add('upload-success');
+      document.getElementById('actionButtons').classList.remove('hidden');
+      
+      const status = document.getElementById('uploadStatus');
+      status.classList.remove('hidden');
+      status.querySelector('p').textContent = 'File uploaded successfully!';
+      status.querySelector('p').className = 'text-sm text-green-600';
+  }
+
+  // Show upload error
+  function showUploadError(message) {
+      uploadZone.classList.add('upload-error');
+      
+      const status = document.getElementById('uploadStatus');
+      status.classList.remove('hidden');
+      status.querySelector('p').textContent = message;
+      status.querySelector('p').className = 'text-sm text-red-600';
+      
+      setTimeout(() => {
+        uploadZone.classList.remove('upload-error');
+        status.classList.add('hidden');
+      }, 3000);
+  }
+
+  // Display file information
+  function displayFileInfo(file) {
+      const fileInfo = document.getElementById('fileInfo');
+      const fileName = document.getElementById('fileName');
+      const fileSize = document.getElementById('fileSize');
+      
+      fileName.textContent = file.name;
+      fileSize.textContent = formatFileSize(file.size);
+      fileInfo.classList.remove('hidden');
+  }
+
+  // Format file size
+  function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+    // Process PDF file
+    function processPDF(file) {
+      const fileReader = new FileReader();
+      
+      fileReader.onload = function(e) {
+        const typedarray = new Uint8Array(e.target.result);
+        
+        pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+          pdfDoc = pdf;
+          totalPages = pdf.numPages;
+          currentPage = 1;
+          
+          document.getElementById('totalPages').textContent = totalPages;
+          document.getElementById('pageInput').value = currentPage;
+          document.getElementById('pageInput').max = totalPages;
+          
+          renderPage(currentPage);
+          
+          if (totalPages > 1) {
+            document.getElementById('pdfNavigation').classList.remove('hidden');
+          }
+        }).catch(function(error) {
+          console.error('Error loading PDF:', error);
+          showUploadError('Error loading PDF file. Please try again.');
+        });
+      };
+      
+      fileReader.readAsArrayBuffer(file);
+    }
+
+    // Render PDF page
+    function renderPage(pageNum) {
+      pdfDoc.getPage(pageNum).then(function(page) {
+        const scale = 1.2;
+        const viewport = page.getViewport({ scale: scale });
+        
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        canvas.className = 'pdf-canvas mx-auto';
+        
+        const renderContext = {
+          canvasContext: context,
+          viewport: viewport
+        };
+        
+        // Clear previous content and add canvas
+        const previewContainer = document.getElementById('previewContainer');
+        previewContainer.innerHTML = '';
+        previewContainer.appendChild(canvas);
+        
+        page.render(renderContext);
+        
+        // Update navigation buttons
+        document.getElementById('prevBtn').disabled = pageNum === 1;
+        document.getElementById('nextBtn').disabled = pageNum === totalPages;
+        document.getElementById('pageInput').value = pageNum;
+      });
+    }
+
+    // Show DOC/DOCX preview message
+    function showDocPreview() {
+      const previewContainer = document.getElementById('previewContainer');
+      previewContainer.innerHTML = `
+        <div class="text-center">
+          <div class="w-24 h-24 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+            <svg class="w-12 h-12 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold mb-2">Document Uploaded Successfully</h3>
+          <p class="text-gray-600 mb-4">${currentFile.name}</p>
+          <p class="text-sm text-gray-500">Preview not available for DOC/DOCX files</p>
+          <p class="text-sm text-gray-500">Use the buttons below to enhance your resume</p>
+        </div>
+      `;
+    }
+
+    // PDF navigation functions
+    function previousPage() {
+      if (currentPage > 1) {
+        currentPage--;
+        renderPage(currentPage);
+      }
+    }
+
+    function nextPage() {
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderPage(currentPage);
+      }
+    }
+
+    function goToPage(pageNum) {
+      const page = parseInt(pageNum);
+      if (page >= 1 && page <= totalPages) {
+        currentPage = page;
+        renderPage(currentPage);
+      }
+    }
+
+    // Remove file
+    function removeFile() {
+      currentFile = null;
+      pdfDoc = null;
+      currentPage = 1;
+      totalPages = 0;
+      
+      document.getElementById('fileInfo').classList.add('hidden');
+      document.getElementById('actionButtons').classList.add('hidden');
+      document.getElementById('pdfNavigation').classList.add('hidden');
+      document.getElementById('uploadProgress').classList.add('hidden');
+      document.getElementById('uploadStatus').classList.add('hidden');
+      
+      uploadZone.classList.remove('upload-success', 'upload-error');
+      fileInput.value = '';
+      
+      // Reset preview
+      const previewContainer = document.getElementById('previewContainer');
+      previewContainer.innerHTML = `
+        <div class="text-center text-gray-500">
+          <svg class="w-24 h-24 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <p class="text-lg">Upload a resume to see preview</p>
+          <p class="text-sm text-gray-400 mt-2">PDF files will be displayed here</p>
+        </div>
+      `;
+    }
+
+    // Action button functions - FIXED ENHANCE RESUME FUNCTION
+    function enhanceResume() {
+      if (!currentFile) {
+        alert('Please upload a resume first.');
+        return;
+      }
+      
+      // Show loading state
+      const btn = event.target;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `
+        <svg class="animate-spin w-5 h-5 inline-block mr-2" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Processing...
+      `;
+      btn.disabled = true;
+      
+      // Simulate processing time
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        
+        // Navigate to templates page with uploaded file name as parameter
+        window.location.href = './templates.html?file=' + encodeURIComponent(currentFile.name);
+      }, 2000);
+    }
+
+  function checkATSScore() {
+    if (!currentFile) {
+      alert('Please upload a resume first.');
+      return;
+    }
+
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `
+      <svg class="animate-spin w-5 h-5 inline-block mr-2" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      Analyzing...
+    `;
+    btn.disabled = true;
+
+    // Use the secured filename that was actually saved
+    const fileNameToUse = currentFile.savedName || currentFile.name;
+    
+    setTimeout(() => {
+      window.location.href = '/ats-score?file=' + encodeURIComponent(fileNameToUse);
+    }, 1500);
+  }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (pdfDoc && totalPages > 1) {
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          previousPage();
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          nextPage();
+        }
+      }
+    });
+
+    // Mobile menu toggle (if needed)
+    document.addEventListener('DOMContentLoaded', function () {
+      // Add any additional initialization here
+      console.log('Upload resume page loaded');
+      
+      // Add smooth animations on load
+      setTimeout(() => {
+        document.querySelector('.animate__fadeInLeft').classList.add('animate__animated', 'animate__fadeInLeft');
+        document.querySelector('.animate__fadeInRight').classList.add('animate__animated', 'animate__fadeInRight');
+      }, 100);
+    });
+
+    // Handle window resize for responsive PDF canvas
+    window.addEventListener('resize', () => {
+      if (pdfDoc && currentPage) {
+        renderPage(currentPage);
+      }
+    });
+
+    // Add ripple effect to buttons
+    document.querySelectorAll('.modern-btn').forEach(button => {
+      button.addEventListener('click', function(e) {
+        const ripple = document.createElement('span');
+        const rect = this.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+        
+        ripple.style.width = ripple.style.height = size + 'px';
+        ripple.style.left = x + 'px';
+        ripple.style.top = y + 'px';
+        ripple.classList.add('ripple');
+        
+        this.appendChild(ripple);
+        
+        setTimeout(() => {
+          ripple.remove();
+        }, 600);
+      });
+    });
+  </script>
+
+  <style>
+    /* Additional styles for enhanced functionality */
+    
+    /* Ripple effect */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(0);
+      animation: ripple-animation 0.6s linear;
+      pointer-events: none;
+    }
+
+    @keyframes ripple-animation {
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+
+    /* Button loading state */
+    .modern-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .modern-btn:disabled:hover {
+      transform: none !important;
+      box-shadow: 
+        0 10px 20px rgba(59, 130, 246, 0.3),
+        0 4px 8px rgba(59, 130, 246, 0.2) !important;
+    }
+
+    /* PDF canvas responsive */
+    @media (max-width: 768px) {
+      .pdf-canvas {
+        max-width: 100%;
+        height: auto;
+      }
+      
+      .pdf-preview {
+        min-height: 400px;
+      }
+      
+      .pdf-nav {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      
+      .pdf-nav > div {
+        order: -1;
+      }
+    }
+
+    /* Enhanced mobile responsiveness */
+    @media (max-width: 640px) {
+      .grid.lg\\:grid-cols-2 {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      
+      .upload-zone {
+        padding: 1.5rem;
+      }
+      
+      .glass-card {
+        padding: 1.5rem;
+      }
+      
+      .modern-btn {
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+      }
+    }
+
+    /* Smooth transitions for state changes */
+    .upload-zone {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .upload-zone.dragover {
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.02);
+      }
+    }
+
+    /* Enhanced focus states for accessibility */
+    .modern-btn:focus {
+      outline: 2px solid rgba(59, 130, 246, 0.5);
+      outline-offset: 2px;
+    }
+
+    input[type="file"]:focus + button {
+      outline: 2px solid rgba(59, 130, 246, 0.5);
+      outline-offset: 2px;
+    }
+
+    /* Loading animation for file processing */
+    .processing {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .processing::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      animation: shimmer 1.5s infinite;
+    }
+
+    /* Success and error animations */
+    .upload-success {
+      animation: success-pulse 0.6s ease-out;
+    }
+
+    .upload-error {
+      animation: error-shake 0.6s ease-out;
+    }
+
+    @keyframes success-pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes error-shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    /* File type icon colors */
+    .file-pdf { color: #dc2626; }
+    .file-doc { color: #2563eb; }
+    .file-docx { color: #2563eb; }
+  </style>
+</body>
+
+</html>

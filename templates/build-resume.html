@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Build Resume - Resume Builder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'primary': '#2563eb',
+            'primary-dark': '#1d4ed8'
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* Clean input styling */
+    .form-input {
+      transition: all 0.2s ease;
+      border: 1.5px solid #e5e7eb;
+    }
+
+    .form-input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      outline: none;
+    }
+
+    .form-input:focus-visible {
+      outline: 2px solid #2563eb;
+      outline-offset: 2px;
+    }
+
+    /* Section styling */
+    .section-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      transition: all 0.2s ease;
+    }
+
+    .section-card:hover {
+      border-color: #d1d5db;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Button styling */
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #374151;
+      border: 1px solid #d1d5db;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background: #e5e7eb;
+      border-color: #9ca3af;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      transition: all 0.2s ease;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+      transform: translateY(-1px);
+    }
+
+    /* Preview styling */
+    .preview-container {
+      background: white;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .preview-header {
+      background: #1f2937;
+      color: white;
+    }
+
+    .preview-section h3 {
+      color: #1f2937;
+      font-weight: 600;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 0.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    /* Progress bar */
+    .progress-bar {
+      background: linear-gradient(90deg, #2563eb, #1d4ed8);
+      height: 3px;
+      transition: width 0.3s ease;
+    }
+
+    /* Sticky preview */
+    @media (min-width: 1024px) {
+      .sticky-preview {
+        position: sticky;
+        top: 2rem;
+        max-height: calc(100vh - 4rem);
+        overflow-y: auto;
+      }
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 1023px) {
+      .mobile-preview-btn {
+        display: none;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .mobile-preview-btn {
+        display: none;
+      }
+    }
+
+    /* Custom scrollbar */
+    .custom-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+  <!-- Progress Bar -->
+  <div class="fixed top-0 left-0 w-full z-50">
+    <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center space-x-4">
+          <img src="https://www.guvi.in/assets/CPYoUJqK-guvilogo-hcl.webp" class="h-8 w-auto" alt="Guvi Logo" />
+          <h1 class="text-xl font-semibold text-gray-900">Resume Builder</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span class="text-sm text-gray-500" id="progressText">0% Complete</span>
+          <a href="{{ url_for('resume_options') }}" class="text-gray-600 hover:text-gray-900 text-sm">← Back</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="space-y-6">
+        
+        <!-- Personal Information -->
+        <div class="section-card rounded-lg p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            Personal Information
+          </h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+              <input
+                type="text"
+                id="fullName"
+                name="fullName"
+                class="form-input w-full px-3 py-2 rounded-md"
+                placeholder="John Doe"
+                value="{{ data.get('name', '') if data else '' }}"
+                oninput="updatePreview()"
+              />
+            </div>
+            <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Job Title *</label>
+            <input
+              type="text"
+              id="jobTitle"
+              name="jobTitle"
+              class="form-input w-full px-3 py-2 rounded-md"
+              placeholder="Software Engineer"
+              value="{{ data.get('job_title', '') if data else '' }}"
+              oninput="updatePreview()"
+            >
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="form-input w-full px-3 py-2 rounded-md"
+                placeholder="john@example.com"
+                value="{{ data.get('email', '') if data else '' }}"
+                oninput="updatePreview()"
+              >
+            </div>
+            <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              class="form-input w-full px-3 py-2 rounded-md"
+              placeholder="+1 (555) 123-4567"
+              value="{{ data.get('phone', '') if data else '' }}"
+              oninput="updatePreview()"
+            >
+          </div>
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+              <input
+                type="text"
+                id="location"
+                name="location"
+                class="form-input w-full px-3 py-2 rounded-md"
+                placeholder="City, State, Country"
+                value="{{ data.get('location', '') if data else '' }}"
+                oninput="updatePreview()"
+              >
+            </div>
+            <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Professional Summary</label>
+            <textarea
+              id="summary"
+              name="summary"
+              class="form-input w-full px-3 py-2 rounded-md resize-none"
+              rows="3"
+              placeholder="Brief description of your professional background and key achievements..."
+              oninput="updatePreview()"
+            >{{ data.get('summary', '') if data else '' }}</textarea>
+          </div>
+          </div>
+        </div>
+
+        <!-- Work Experience -->
+        <div class="section-card rounded-lg p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0H8m8 0v2m-8-2v2m0 0H4a2 2 0 00-2 2v8a2 2 0 002 2h16a2 2 0 002-2V8a2 2 0 00-2-2h-4z" />
+              </svg>
+              Work Experience
+            </h2>
+            <button onclick="addExperience()" class="btn-secondary px-3 py-2 rounded-md text-sm font-medium">
+              + Add Experience
+            </button>
+          </div>
+          
+          <div id="experienceContainer" class="space-y-4">
+            <!-- Experience entries will be added here -->
+          </div>
+        </div>
+
+        <!-- Education -->
+        <div class="section-card rounded-lg p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" />
+              </svg>
+              Education
+            </h2>
+            <button onclick="addEducation()" class="btn-secondary px-3 py-2 rounded-md text-sm font-medium">
+              + Add Education
+            </button>
+          </div>
+          
+          <div id="educationContainer" class="space-y-4">
+            <!-- Education entries will be added here -->
+          </div>
+        </div>
+
+        <!-- Skills -->
+        <div class="section-card rounded-lg p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            Skills
+          </h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Technical Skills</label>
+              <textarea
+                id="technicalSkills"
+                name="technicalSkills"
+                class="form-input w-full px-3 py-2 rounded-md resize-none"
+                rows="3"
+                placeholder="Python, SQL, Machine Learning..."
+                oninput="updatePreview()"
+              >{{ ', '.join(data.get("technical_skills", [])) if data else '' }}</textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Soft Skills</label>
+              <textarea
+                id="softSkills"
+                name="softSkills"
+                class="form-input w-full px-3 py-2 rounded-md resize-none"
+                rows="3"
+                placeholder="Leadership, Communication, Problem Solving..."
+                oninput="updatePreview()"
+              >{{ ', '.join(data.get('soft_skills', [])) if data else '' }}</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Projects -->
+        <div class="section-card rounded-lg p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              Projects
+            </h2>
+            <button onclick="addProject()" class="btn-secondary px-3 py-2 rounded-md text-sm font-medium">
+              + Add Project
+            </button>
+          </div>
+          
+          <div id="projectsContainer" class="space-y-4">
+            <!-- Project entries will be added here -->
+          </div>
+        </div>
+
+        <!-- Continue Button -->
+        <div class="section-card rounded-lg p-6 text-center">
+          <button onclick="proceedToTemplates()" class="btn-primary text-white px-8 py-3 rounded-md font-medium text-lg w-full sm:w-auto">
+            Continue to Templates →
+          </button>
+          <p class="text-sm text-gray-600 mt-2">Choose from professional templates to finalize your resume</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<script>
+  const parsedEducation = {{ data.get('education',[]) | tojson | safe }};
+  const parsedExperience = {{ data.get('experience',[]) | tojson | safe }};
+  const parsedProjects = {{ data.get('projects', []) | tojson | safe }};
+  
+  populateEducation(parsedEducation);
+  populateExperience(parsedExperience);
+  populateProjects(parsedProjects);
+  
+</script>
+  
+  <script>
+    // Global variables
+    let experienceCount = 0;
+    let educationCount = 0;
+    let projectCount = 0;
+    let resumeData = {};
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      updatePreview();
+      updateProgress();
+    });
+
+    // Add experience entry
+    function addExperience() {
+      experienceCount++;
+      const container = document.getElementById('experienceContainer');
+      const entry = document.createElement('div');
+      entry.className = 'border border-gray-200 rounded-md p-4 bg-gray-50';
+      entry.id = `experience-${experienceCount}`;
+      
+      entry.innerHTML = `
+        <div class="flex items-center justify-between mb-3">
+          <h4 class="font-medium text-gray-900">Experience ${experienceCount}</h4>
+          <button onclick="removeEntry('experience-${experienceCount}')" class="btn-danger text-white px-2 py-1 rounded text-xs">
+            Remove
+          </button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Job Title</label>
+            <input type="text" class="form-input w-full px-3 py-2 rounded-md text-sm" placeholder="Software Engineer" oninput="updatePreview()">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Company</label>
+            <input type="text" class="form-input w-full px-3 py-2 rounded-md text-sm" placeholder="Tech Corp" oninput="updatePreview()">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+            <input type="month" class="form-input w-full px-3 py-2 rounded-md text-sm" oninput="updatePreview()">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+            <input type="month" class="form-input w-full px-3 py-2 rounded-md text-sm" placeholder="Leave empty if current" oninput="updatePreview()">
+            <label class="flex items-center mt-1 text-sm text-gray-600">
+              <input type="checkbox" class="mr-2" onchange="toggleCurrentJob(this)"> Currently working here
+            </label>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea class="form-input w-full px-3 py-2 rounded-md text-sm resize-none" rows="3" placeholder="• Key achievements and responsibilities
+            • Use bullet points for better readability
+            • Focus on results and impact" oninput="updatePreview()"></textarea>
+          </div>
+        </div>
+      `;
+      
+      container.appendChild(entry);
+      updatePreview();
+    }
+function populateExperience(experienceData) {
+    experienceData.forEach((exp) => {
+      experienceCount++;
+      const container = document.getElementById('experienceContainer');
+      const entry = document.createElement('div');
+      entry.className = 'border border-gray-200 rounded-md p-4 bg-gray-50';
+      entry.id = `experience-${experienceCount}`;
+      
+      // Parse start and end from the duration string
+      let startDate = "";
+      let endDate = "";
+      if (exp.duration && exp.duration.includes("–")) {
+        [startDate, endDate] = exp.duration.split("–").map(s => s.trim());
+      }
+
+      entry.innerHTML = `
+        <div class="flex items-center justify-between mb-3">
+          <h4 class="font-medium text-gray-900">Experience ${experienceCount}</h4>
+          <button onclick="removeEntry('experience-${experienceCount}')" class="btn-danger text-white px-2 py-1 rounded text-xs">
+            Remove
+          </button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Job Title</label>
+            <input type="text" class="form-input w-full px-3 py-2 rounded-md text-sm" value="${exp.job_title || ''}" oninput="updatePreview()">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Company</label>
+            <input type="text" class="form-input w-full px-3 py-2 rounded-md text-sm" value="${exp.company || ''}" oninput="updatePreview()">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+            <input type="text" class="form-input w-full px-3 py-2 rounded-md text-sm" value="${exp.start_date}" oninput="updatePreview()">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+            <input type="text" class="form-input w-full px-3 py-2 rounded-md text-sm" value="${exp.end_date}" oninput="updatePreview()">
+            <label class="flex items-center mt-1 text-sm text-gray-600">
+              <input type="checkbox" class="mr-2"> Currently working here
+            </label>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea class="form-input w-full px-3 py-2 rounded-md text-sm resize-none" rows="3" oninput="updatePreview()">${exp.description || ''}</textarea>
+          </div>
+        </div>
+      `;
+
+      container.appendChild(entry);
+    });
+
+    updatePreview();
+  }
+  window.addEventListener('DOMContentLoaded', () => {
+    populateExperience(parsedExperience);
+  });
+    // Add education entry
+    function addEducation() {
+      educationCount++;
+      const container = document.getElementById('educationContainer');
+      const entry = document.createElement('div');
+      entry.className = 'border border-gray-200 rounded-md p-4 bg-gray-50';
+      entry.id = `education-${educationCount}`;
+      
+      entry.innerHTML = `
+        <div class="flex items-center justify-between mb-3">
+          <h4 class="font-medium text-gray-900">Education ${educationCount}</h4>
+          <button onclick="removeEntry('education-${educationCount}')" class="btn-danger text-white px-2 py-1 rounded text-xs">
+            Remove
+          </button>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Degree</label>
+            <input type="text" class="form-input w-full px-3 py-2 rounded-md text-sm" placeholder="Bachelor of Science" oninput="updatePreview()">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Field of Study</label>
+            <input type="text" class="form-input w-full px-3 py-2 rounded-md text-sm" placeholder="Computer Science" oninput="updatePreview()">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Institution</label>
+            <input type="text" class="form-input w-full px-3 py-2 rounded-md text-sm" placeholder="University Name" oninput="updatePreview()">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Year</label>
+            <input type="number" class="form-input w-full px-3 py-2 rounded-md text-sm" placeholder="2023" min="1900" max="2030" oninput="updatePreview()">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Percentage or GPA (Optional)</label>
+            <input type="text" class="form-input w-full px-3 py-2 rounded-md text-sm" placeholder="85 or 3.8/4.0" oninput="updatePreview()">
+          </div>
+        </div>
+      `;
+      
+      container.appendChild(entry);
+      updatePreview();
+    }
+
+  function populateEducation(educationData) {
+  if (!educationData || educationData.length === 0) return;
+
+  const container = document.getElementById('educationContainer');
+  container.innerHTML = ''; // Clear any pre-added field
+
+  educationData.forEach((edu, index) => {
+    const entry = document.createElement('div');
+    entry.className = 'border border-gray-200 rounded-md p-4 bg-gray-50';
+    entry.id = `education-${index + 1}`;
+
+    entry.innerHTML = `
+      <div class="flex items-center justify-between mb-3">
+        <h4 class="font-medium text-gray-900">Education ${index + 1}</h4>
+        <button onclick="removeEntry('education-${index + 1}')" class="btn-danger text-white px-2 py-1 rounded text-xs">Remove</button>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Degree</label>
+          <input type="text" class="form-input w-full px-3 py-2 rounded-md text-sm" value="${edu.degree || edu.course || ''}" oninput="updatePreview()">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Field of Study</label>
+          <input type="text" class="form-input w-full px-3 py-2 rounded-md text-sm" value="${edu.field_of_study || ''}" oninput="updatePreview()">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Institution</label>
+          <input type="text" class="form-input w-full px-3 py-2 rounded-md text-sm" value="${edu.institution || edu.institiution || ''}" oninput="updatePreview()">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Year</label>
+          <input type="number" class="form-input w-full px-3 py-2 rounded-md text-sm" value="${edu.year || ''}" oninput="updatePreview()">
+        </div>
+        <div class="sm:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-1">GPA (Optional)</label>
+          <input type="text" class="form-input w-full px-3 py-2 rounded-md text-sm" value="${edu.percentage || edu.gpa || ''}" oninput="updatePreview()">
+        </div>
+      </div>`;
+
+    container.appendChild(entry);
+  });
+
+  educationCount = educationData.length;
+  updatePreview();
+}
+
+  window.addEventListener('DOMContentLoaded', () => {
+    populateEducation(parsedEducation);
+  });
+
+    // Add project entry
+    function addProject() {
+      projectCount++;
+      const container = document.getElementById('projectsContainer');
+      const entry = document.createElement('div');
+      entry.className = 'border border-gray-200 rounded-md p-4 bg-gray-50';
+      entry.id = `project-${projectCount}`;
+      
+      entry.innerHTML = `
+        <div class="flex items-center justify-between mb-3">
+          <h4 class="font-medium text-gray-900">Project ${projectCount}</h4>
+          <button onclick="removeEntry('project-${projectCount}')" class="btn-danger text-white px-2 py-1 rounded text-xs">
+            Remove
+          </button>
+        </div>
+        <div class="grid grid-cols-1 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Project Name</label>
+              <input type="text" class="form-input w-full px-3 py-2 rounded-md text-sm" placeholder="E-commerce Website" oninput="updatePreview()">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Technologies</label>
+              <input type="text" class="form-input w-full px-3 py-2 rounded-md text-sm" placeholder="React, Node.js, MongoDB" oninput="updatePreview()">
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea class="form-input w-full px-3 py-2 rounded-md text-sm resize-none" rows="3" placeholder="• Brief description of the project
+          • Key features and achievements
+          • Technologies used and challenges solved" oninput="updatePreview()"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Project URL (Optional)</label>
+            <input type="url" class="form-input w-full px-3 py-2 rounded-md text-sm" placeholder="https://github.com/username/project" oninput="updatePreview()">
+          </div>
+        </div>
+      `;
+      
+      container.appendChild(entry);
+      updatePreview();
+    }
+    function populateProjects(projectsData) {
+  if (!Array.isArray(projectsData)) return;
+
+  projectsData.forEach((proj) => {
+    projectCount++;
+    const container = document.getElementById('projectsContainer');
+    const entry = document.createElement('div');
+    entry.className = 'border border-gray-200 rounded-md p-4 bg-gray-50';
+    entry.id = `project-${projectCount}`;
+
+    const tools = Array.isArray(proj.tools) ? proj.tools.join(", ") : "";
+
+    entry.innerHTML = `
+      <div class="flex items-center justify-between mb-3">
+        <h4 class="font-medium text-gray-900">Project ${projectCount}</h4>
+        <button onclick="removeEntry('project-${projectCount}')" class="btn-danger text-white px-2 py-1 rounded text-xs">
+          Remove
+        </button>
+      </div>
+      <div class="grid grid-cols-1 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Project Name</label>
+            <input type="text" class="form-input w-full px-3 py-2 rounded-md text-sm" value="${proj.title || ''}" placeholder="E-commerce Website" oninput="updatePreview()">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Technologies</label>
+            <input type="text" class="form-input w-full px-3 py-2 rounded-md text-sm" value="${proj.tools || ''}" placeholder="React, Node.js, MongoDB" oninput="updatePreview()">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+          <textarea class="form-input w-full px-3 py-2 rounded-md text-sm resize-none" rows="3" oninput="updatePreview()">${proj.description || ''}</textarea>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Project URL (Optional)</label>
+          <input type="url" class="form-input w-full px-3 py-2 rounded-md text-sm" value="${proj.github_url || ''}" placeholder="https://github.com/username/project" oninput="updatePreview()">
+        </div>
+      </div>
+    `;
+
+    container.appendChild(entry);
+  });
+
+  updatePreview();
+}
+window.addEventListener('DOMContentLoaded', () => {
+  
+  populateProjects(parsedProjects);       // new line
+});
+    // Remove entry
+    function removeEntry(entryId) {
+      const entry = document.getElementById(entryId);
+      if (entry) {
+        entry.remove();
+        updatePreview();
+      }
+    }
+
+    // Toggle current job
+    function toggleCurrentJob(checkbox) {
+      const endDateInput = checkbox.closest('.grid').querySelector('input[type="month"]:last-of-type');
+      if (checkbox.checked) {
+        endDateInput.value = '';
+        endDateInput.disabled = true;
+        endDateInput.placeholder = 'Currently working here';
+      } else {
+        endDateInput.disabled = false;
+        endDateInput.placeholder = 'Leave empty if current';
+      }
+      updatePreview();
+    }
+
+    // Update preview
+    function updatePreview() {
+      // Simplified - just update progress and save data
+      updateProgress();
+      saveResumeData();
+    }
+
+    // Remove all preview-related functions
+    // updateExperiencePreview, updateEducationPreview, updateSkillsPreview, updateProjectsPreview functions removed
+
+    // Format date
+    function formatDate(dateString) {
+      if (!dateString) return '';
+      const [year, month] = dateString.split('-');
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return `${monthNames[parseInt(month) - 1]} ${year}`;
+    }
+
+    // Update progress
+    function updateProgress() {
+      let completedSections = 0;
+      const totalSections = 3; // Personal info, experience, education are required
+
+      // Check personal info
+      const requiredFields = ['fullName', 'jobTitle', 'email'];
+      const personalComplete = requiredFields.every(field => 
+        document.getElementById(field).value.trim() !== ''
+      );
+      if (personalComplete) completedSections++;
+
+      // Check experience
+      const hasExperience = Array.from(document.querySelectorAll('[id^="experience-"] input, [id^="experience-"] textarea'))
+        .some(input => input.value.trim() !== '');
+      if (hasExperience) completedSections++;
+
+      // Check education
+      const hasEducation = Array.from(document.querySelectorAll('[id^="education-"] input'))
+        .some(input => input.value.trim() !== '');
+      if (hasEducation) completedSections++;
+
+      const progress = (completedSections / totalSections) * 100;
+      document.getElementById('progressBar').style.width = progress + '%';
+      document.getElementById('progressText').textContent = `${Math.round(progress)}% Complete`;
+    }
+
+    // Save resume data
+    function saveResumeData() {
+      resumeData = {
+        personalInfo: {
+          fullName: document.getElementById('fullName').value,
+          jobTitle: document.getElementById('jobTitle').value,
+          email: document.getElementById('email').value,
+          phone: document.getElementById('phone').value,
+          location: document.getElementById('location').value,
+          summary: document.getElementById('summary').value
+        },
+        experience: [],
+        education: [],
+        skills: {
+          technical: document.getElementById('technicalSkills').value,
+          soft: document.getElementById('softSkills').value
+        },
+        projects: []
+      };
+
+      // Collect experience data
+      document.querySelectorAll('[id^="experience-"]').forEach(exp => {
+        const inputs = exp.querySelectorAll('input, textarea');
+        const isCurrentJob = exp.querySelector('input[type="checkbox"]').checked;
+        resumeData.experience.push({
+          jobTitle: inputs[0].value,
+          company: inputs[1].value,
+          startDate: inputs[2].value,
+          endDate: isCurrentJob ? '' : inputs[3].value,
+          isCurrent: isCurrentJob,
+          description: inputs[4].value
+        });
+      });
+
+      // Collect education data
+      document.querySelectorAll('[id^="education-"]').forEach(edu => {
+        const inputs = edu.querySelectorAll('input');
+        resumeData.education.push({
+          degree: inputs[0].value,
+          field: inputs[1].value,
+          institution: inputs[2].value,
+          year: inputs[3].value,
+          gpa: inputs[4].value
+        });
+      });
+
+      // Collect projects data
+      document.querySelectorAll('[id^="project-"]').forEach(proj => {
+        const inputs = proj.querySelectorAll('input, textarea');
+        resumeData.projects.push({
+          name: inputs[0].value,
+          technologies: inputs[1].value,
+          description: inputs[2].value,
+          url: inputs[3].value
+        });
+      });
+
+      // Store in sessionStorage
+      const sessionData = {
+        resumeData: resumeData,
+        buildMethod: 'manual',
+        timestamp: new Date().toISOString(),
+        sessionId: generateSessionId()
+      };
+      
+      sessionStorage.setItem('resumeSession', JSON.stringify(sessionData));
+    }
+
+    // Generate session ID
+    function generateSessionId() {
+      return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    // Remove mobile preview functions
+    // toggleMobilePreview and updateMobilePreview functions removed
+
+    // Proceed to templates
+    function proceedToTemplates() {
+      // Validate required fields
+      const requiredFields = ['fullName', 'jobTitle', 'email'];
+      const missingFields = requiredFields.filter(field => 
+        !document.getElementById(field).value.trim()
+      );
+
+      if (missingFields.length > 0) {
+        alert('Please fill in all required fields (Name, Job Title, Email) before proceeding.');
+        document.getElementById(missingFields[0]).focus();
+        return;
+      }
+
+      // Check if at least one experience or education is filled
+      const hasExperience = Array.from(document.querySelectorAll('[id^="experience-"] input, [id^="experience-"] textarea'))
+        .some(input => input.value.trim() !== '');
+      const hasEducation = Array.from(document.querySelectorAll('[id^="education-"] input'))
+        .some(input => input.value.trim() !== '');
+
+      if (!hasExperience && !hasEducation) {
+        alert('Please add at least one work experience or education entry.');
+        return;
+      }
+
+      // Save final data
+      saveResumeData();
+
+      // Show loading state
+      const btn = event.target;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `
+        <svg class="animate-spin w-5 h-5 inline-block mr-2" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Saving Resume...
+      `;
+      btn.disabled = true;
+
+      // Simulate saving process
+      setTimeout(() => {
+        const sessionData = JSON.parse(sessionStorage.getItem('resumeSession') || '{}');
+        window.location.href = `./templates.html?method=manual&session=${sessionData.sessionId}`;
+      }, 1500);
+    }
+
+    // Auto-save functionality
+    let autoSaveTimeout;
+    function autoSave() {
+      clearTimeout(autoSaveTimeout);
+      autoSaveTimeout = setTimeout(() => {
+        saveResumeData();
+      }, 1000);
+    }
+
+    // Add auto-save listeners
+    document.addEventListener('input', autoSave);
+
+    // Email validation
+    document.getElementById('email').addEventListener('input', function() {
+      const email = this.value;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      
+      if (email && !emailRegex.test(email)) {
+        this.style.borderColor = '#ef4444';
+      } else if (email && emailRegex.test(email)) {
+        this.style.borderColor = '#10b981';
+      } else {
+        this.style.borderColor = '#e5e7eb';
+      }
+    });
+
+    // Phone formatting
+    document.getElementById('phone').addEventListener('input', function() {
+      let value = this.value.replace(/\D/g, '');
+      if (value.length >= 6) {
+        value = value.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+      } else if (value.length >= 3) {
+        value = value.replace(/(\d{3})(\d{0,3})/, '($1) $2');
+      }
+      this.value = value;
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 's') {
+          e.preventDefault();
+          saveResumeData();
+        }
+      }
+      
+      // ESC key handler removed since no mobile preview
+      if (e.key === 'Escape') {
+        // No action needed
+      }
+    });
+  </script>
+</body>
+
+</html>

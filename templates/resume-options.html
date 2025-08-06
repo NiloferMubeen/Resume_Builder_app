@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Get Started - Resume Builder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'primary-25': '#f8fafc',
+            'primary-50': '#f1f5f9',
+            'primary-800': '#1e293b'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Animate.css for animation effects -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  
+  <!-- Google Sign-In API -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  
+  <style>
+    /* Gradient text */
+    .gradient-text {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    /* Option card hover effects */
+    .option-card {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+    
+    .option-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+    }
+    
+    .option-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 197, 253, 0.1) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border-radius: inherit;
+    }
+    
+    .option-card:hover::before {
+      opacity: 1;
+    }
+    
+    /* Icon animations */
+    .option-icon {
+      transition: transform 0.3s ease;
+    }
+    
+    .option-card:hover .option-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+    
+    /* Floating elements animation */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+    }
+    
+    .float-animation { animation: float 6s ease-in-out infinite; }
+    
+    /* Progress indicators */
+    .progress-step {
+      transition: all 0.3s ease;
+    }
+    
+    .progress-step.active {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 overflow-x-hidden">
+
+  <!-- Navbar (same as landing page) -->
+  <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200/20 sticky top-0 z-50">
+    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+      <a href="/" class="flex items-center space-x-3">
+        <img src="https://www.guvi.in/assets/CPYoUJqK-guvilogo-hcl.webp" class="h-10 w-auto" alt="Guvi Logo" />
+      </a>
+      
+      <!-- Mobile menu button -->
+      <button data-collapse-toggle="navbar-default" type="button" 
+              class="inline-flex items-center p-2 w-10 h-10 justify-center text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200">
+        <span class="sr-only">Open main menu</span>
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 17 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15" />
+        </svg>
+      </button>
+      
+      <div class="hidden w-full md:block md:w-auto" id="navbar-default">
+        <ul class="font-medium flex flex-col p-4 md:p-0 mt-4 md:flex-row md:space-x-8 md:mt-0 items-center">
+          <li><a href="/" class="block py-2 px-3 text-gray-700 hover:text-blue-600 transition-colors">Home</a></li>
+          <li><a href="#" class="block py-2 px-3 text-gray-700 hover:text-blue-600 transition-colors">About</a></li>
+          <li><a href="#" class="block py-2 px-3 text-gray-700 hover:text-blue-600 transition-colors">Services</a></li>
+          <li><a href="#" class="block py-2 px-3 text-gray-700 hover:text-blue-600 transition-colors">Pricing</a></li>
+          <li><a href="#" class="block py-2 px-3 text-gray-700 hover:text-blue-600 transition-colors">Contact</a></li>
+          <li>
+            <!-- Google Sign-In Button -->
+            <div id="g_id_onload"
+                 data-client_id="YOUR_GOOGLE_CLIENT_ID"
+                 data-callback="handleCredentialResponse"
+                 data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin" 
+                 data-type="standard"
+                 data-size="medium"
+                 data-theme="outline"
+                 data-text="sign_in_with"
+                 data-shape="rectangular"
+                 data-logo_alignment="left">
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Progress Indicator -->
+  <div class="bg-white/50 py-4">
+    <div class="max-w-screen-xl mx-auto px-4">
+      <div class="flex items-center justify-center space-x-4">
+        <div class="flex items-center">
+          <div class="progress-step active w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold">1</div>
+          <span class="ml-2 text-sm font-medium text-blue-600">Choose Method</span>
+        </div>
+        <div class="w-16 h-0.5 bg-gray-300"></div>
+        <div class="flex items-center">
+          <div class="progress-step w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-sm font-semibold">2</div>
+          <span class="ml-2 text-sm font-medium text-gray-500">Build Resume</span>
+        </div>
+        <div class="w-16 h-0.5 bg-gray-300"></div>
+        <div class="flex items-center">
+          <div class="progress-step w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-sm font-semibold">3</div>
+          <span class="ml-2 text-sm font-medium text-gray-500">Download</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <section class="relative py-20 lg:py-32">
+    <!-- Background decorative elements -->
+    <div class="absolute inset-0 overflow-hidden">
+      <div class="absolute -top-40 -right-40 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl"></div>
+      <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-400/10 rounded-full blur-3xl"></div>
+    </div>
+    
+    <div class="relative max-w-screen-xl mx-auto px-4">
+      <div class="text-center mb-16">
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight animate__animated animate__fadeInDown">
+          How would you like to
+          <span class="gradient-text">get started?</span>
+        </h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto animate__animated animate__fadeInUp animate__delay-1s">
+          Choose the method that works best for you. Both options will help you create a professional, ATS-friendly resume.
+        </p>
+      </div>
+      
+      <!-- Options Cards -->
+      <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 max-w-5xl mx-auto">
+        
+        <!-- Upload Resume Option -->
+        <div class="option-card relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 lg:p-12 border border-white/20 hover:border-blue-200/50 animate__animated animate__fadeInLeft animate__delay-2s"
+             onclick="window.location.href='/upload-resume'">
+          <div class="text-center">
+            <div class="option-icon w-24 h-24 bg-gradient-to-br from-blue-100 to-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <svg class="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+              </svg>
+            </div>
+            
+            <h2 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-4">Upload Existing Resume</h2>
+            <p class="text-gray-600 text-lg mb-8 leading-relaxed">
+              Already have a resume? Upload it and we'll help you transform it with our professional templates and AI-powered suggestions.
+            </p>
+            
+            <div class="space-y-3 mb-8">
+              <div class="flex items-center text-gray-600">
+                <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <span>Supports PDF, DOC, DOCX formats</span>
+              </div>
+              <div class="flex items-center text-gray-600">
+                <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <span>Automatic content extraction</span>
+              </div>
+              <div class="flex items-center text-gray-600">
+                <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <span>Choose from 20+ templates</span>
+              </div>
+            </div>
+            
+            <div class="bg-blue-50 rounded-xl p-4">
+              <div class="text-sm text-blue-800 font-medium">⚡ Quick Start</div>
+              <div class="text-sm text-blue-600">Get started in under 2 minutes</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Manual Entry Option -->
+        <div class="option-card relative bg-white/80 backdrop-blur-sm rounded-3xl p-8 lg:p-12 border border-white/20 hover:border-purple-200/50 animate__animated animate__fadeInRight animate__delay-2s"
+             onclick="window.location.href='/build-resume'">
+          <div class="text-center">
+            <div class="option-icon w-24 h-24 bg-gradient-to-br from-purple-100 to-purple-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <svg class="w-12 h-12 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+              </svg>
+            </div>
+            
+            <h2 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-4">Start from Scratch</h2>
+            <p class="text-gray-600 text-lg mb-8 leading-relaxed">
+              Build your resume step by step with our guided form. Perfect if you're creating your first resume or want complete control.
+            </p>
+            
+            <div class="space-y-3 mb-8">
+              <div class="flex items-center text-gray-600">
+                <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <span>Step-by-step guided process</span>
+              </div>
+              <div class="flex items-center text-gray-600">
+                <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <span>Real-time preview</span>
+              </div>
+              <div class="flex items-center text-gray-600">
+                <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <span>AI-powered content suggestions</span>
+              </div>
+            </div>
+            
+            <div class="bg-purple-50 rounded-xl p-4">
+              <div class="text-sm text-purple-800 font-medium">🎯 Recommended</div>
+              <div class="text-sm text-purple-600">Best for first-time users</div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      
+      <!-- Additional Info -->
+      <div class="text-center mt-16">
+        <div class="inline-flex items-center px-6 py-3 bg-white/60 backdrop-blur-sm rounded-full border border-white/20">
+          <svg class="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+          </svg>
+          <span class="text-gray-700 font-medium">Both options are completely free to try</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Mobile menu toggle
+    document.addEventListener('DOMContentLoaded', function() {
+      const button = document.querySelector('[data-collapse-toggle="navbar-default"]');
+      const navbar = document.getElementById('navbar-default');
+      
+      if (button && navbar) {
+        button.addEventListener('click', function() {
+          navbar.classList.toggle('hidden');
+        });
+      }
+    });
+
+    // Google Sign-In callback function
+    function handleCredentialResponse(response) {
+      const responsePayload = decodeJwtResponse(response.credential);
+      console.log("ID: " + responsePayload.sub);
+      console.log('Full Name: ' + responsePayload.name);
+      console.log('Email: ' + responsePayload.email);
+      alert('Welcome ' + responsePayload.name + '! Sign-in successful.');
+    }
+    
+    function decodeJwtResponse(token) {
+      var base64Url = token.split('.')[1];
+      var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+    }
+  </script>
+</body>
+</html>

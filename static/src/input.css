@@ -1,0 +1,34 @@
+/* static/src/input.css */
+@import "tailwindcss";
+@import "flowbite/src/themes/default";
+
+@plugin "flowbite/plugin";
+@source "../../node_modules/flowbite";
+
+@theme {
+  /* Cyan-focused shades */
+  --color-primary-25: #e8fdff;   /* Very faint cyan */
+  --color-primary-50: #d0f7fb;   /* Almost white with cyan tint */
+  --color-primary-100: #a0ebf7;  /* Very light cyan */
+  --color-primary-200: #67def0;  /* Soft cyan */
+  --color-primary-300: #2fcfe7;  /* Stronger cyan */
+
+  /* Pink-focused shades */
+  --color-primary-400: #ffe0ec;  /* Very soft pink */
+  --color-primary-500: #fab8d4;  /* Light visible pink */
+  --color-primary-600: #f28bb6;  /* Medium pastel pink */
+
+  /* Purple-focused shades (renamed as primary) */
+  --color-primary-675: #e5daf9; 
+  --color-primary-700: #d6c4f5;  /* Soft lavender */
+  --color-primary-800: #b998ee;  /* Medium purple */
+  --color-primary-900: #9a6add;  /* Rich purple */
+
+ /* Base shades */
+  --color-primary-950: #ffffff;  /* White */
+  --color-primary-975: #800000;
+}
+
+
+
+  

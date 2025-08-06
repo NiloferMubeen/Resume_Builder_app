@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Choose Template - Resume Builder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'primary-25': '#f8fafc',
+            'primary-50': '#f1f5f9',
+            'primary-800': '#1e293b'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Animate.css for animation effects -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  
+  <style>
+    /* Gradient text */
+    .gradient-text {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    /* Template card hover effects */
+    .template-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .template-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    
+    .template-card.selected {
+      transform: scale(1.02);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+    }
+
+    /* Floating elements animation */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    .float-animation { animation: float 6s ease-in-out infinite; }
+
+    /* Modern button styles */
+    .modern-btn {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .modern-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px rgba(59, 130, 246, 0.4);
+    }
+
+    /* Glass morphism */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Responsive grid */
+    @media (max-width: 640px) {
+      .template-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (min-width: 641px) and (max-width: 1024px) {
+      .template-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1025px) {
+      .template-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    /* Loading overlay */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .loading-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .loading-content {
+      background: white;
+      padding: 3rem;
+      border-radius: 1.5rem;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .spinner {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { 
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+      }
+      50% { 
+        box-shadow: 0 0 40px rgba(59, 130, 246, 0.8);
+      }
+    }
+
+    .ai-glow {
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content ai-glow">
+      <div class="w-16 h-16 mx-auto mb-4 text-blue-600">
+        <svg class="spinner w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+      </div>
+      <h3 class="text-xl font-bold mb-2">Enhancing Your Resume</h3>
+      <p class="text-gray-600 mb-4">Our AI is formatting your resume with the selected template...</p>
+      <div class="w-full bg-gray-200 rounded-full h-2">
+        <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" id="progressBar" style="width: 0%"></div>
+      </div>
+      <p class="text-sm text-gray-500 mt-2">This may take a few moments</p>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200/20 sticky top-0 z-50">
+    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+      <a href="/" class="flex items-center space-x-3">
+        <img src="https://www.guvi.in/assets/CPYoUJqK-guvilogo-hcl.webp" class="h-10 w-auto" alt="Guvi Logo" />
+      </a>
+    </div>
+  </nav>
+
+  <!-- Background decorative elements -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl float-animation"></div>
+    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-400/10 rounded-full blur-3xl float-animation" style="animation-delay: 2s;"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="relative max-w-screen-xl mx-auto px-4 py-12">
+    
+    <!-- Header -->
+    <div class="text-center mb-12 animate__animated animate__fadeInUp">
+      <h1 class="text-4xl lg:text-5xl font-bold mb-4">
+        Choose Your <span class="gradient-text">Template</span>
+      </h1>
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+        Select a professional template that matches your style and industry
+      </p>
+    </div>
+
+    <!-- Templates Grid -->
+    <div class="template-grid grid gap-8 mb-12" id="templatesGrid">
+      
+      <!-- Template 1 - Modern Professional -->
+      <div class="template-card bg-white rounded-2xl overflow-hidden shadow-lg animate__animated animate__fadeInUp" data-template="modern-professional" onclick="selectTemplate(this, 'Modern Professional')">
+        <div class="aspect-[3/4] relative">
+          <img src="{{ url_for('static', filename='images/template1.png') }}" 
+               alt="Modern Professional Resume Template" 
+               class="w-full h-full object-cover">
+        </div>
+      </div>
+
+      <!-- Template 2 - Executive Classic -->
+      <div class="template-card bg-white rounded-2xl overflow-hidden shadow-lg animate__animated animate__fadeInUp" data-template="executive-classic" onclick="selectTemplate(this, 'Executive Classic')">
+        <div class="aspect-[3/4] relative">
+          <img src="{{ url_for('static', filename='images/template2.png') }}" 
+               alt="Executive Classic Resume Template" 
+               class="w-full h-full object-cover">
+        </div>
+      </div>
+
+      <!-- Template 3 - Creative Designer -->
+      <div class="template-card bg-white rounded-2xl overflow-hidden shadow-lg animate__animated animate__fadeInUp" data-template="creative-designer" onclick="selectTemplate(this, 'Creative Designer')">
+        <div class="aspect-[3/4] relative">
+          <img src="{{ url_for('static', filename='images/template3.png') }}" 
+               alt="Creative Designer Resume Template" 
+               class="w-full h-full object-cover">
+        </div>
+      </div>
+
+      <!-- Template 4 - Simple Minimal -->
+      <div class="template-card bg-white rounded-2xl overflow-hidden shadow-lg animate__animated animate__fadeInUp" data-template="simple-minimal" onclick="selectTemplate(this, 'Simple Minimal')">
+        <div class="aspect-[3/4] relative">
+          <img src="{{ url_for('static', filename='images/template4.png') }}" 
+               alt="Simple Minimal Resume Template" 
+               class="w-full h-full object-cover">
+        </div>
+      </div>
+
+      <!-- Template 5 - Tech Professional -->
+      <div class="template-card bg-white rounded-2xl overflow-hidden shadow-lg animate__animated animate__fadeInUp" data-template="tech-professional" onclick="selectTemplate(this, 'Tech Professional')">
+        <div class="aspect-[3/4] relative">
+          <img src="{{ url_for('static', filename='images/template5.png') }}" 
+               alt="Tech Professional Resume Template" 
+               class="w-full h-full object-cover">
+        </div>
+      </div>
+
+      <!-- Template 6 - Business Analyst -->
+      <div class="template-card bg-white rounded-2xl overflow-hidden shadow-lg animate__animated animate__fadeInUp" data-template="business-analyst" onclick="selectTemplate(this, 'Business Analyst')">
+        <div class="aspect-[3/4] relative">
+          <img src="{{ url_for('static', filename='images/template6.png') }}" 
+               alt="Business Analyst Resume Template" 
+               class="w-full h-full object-cover">
+        </div>
+      </div>
+
+      <!-- Template 7 - Academic -->
+      <div class="template-card bg-white rounded-2xl overflow-hidden shadow-lg animate__animated animate__fadeInUp" data-template="academic" onclick="selectTemplate(this, 'Academic')">
+        <div class="aspect-[3/4] relative">
+          <img src="{{ url_for('static', filename='images/resume4.png') }}" 
+               alt="Academic Resume Template" 
+               class="w-full h-full object-cover">
+        </div>
+      </div>
+
+      <!-- Template 8 - Sales Professional -->
+      <div class="template-card bg-white rounded-2xl overflow-hidden shadow-lg animate__animated animate__fadeInUp" data-template="sales-professional" onclick="selectTemplate(this, 'Sales Professional')">
+        <div class="aspect-[3/4] relative">
+          <img src="{{ url_for('static', filename='images/resumes/resume1.jpg') }}" 
+               alt="Sales Professional Resume Template" 
+               class="w-full h-full object-cover">
+        </div>
+      </div>
+
+      <!-- Template 9 - Healthcare -->
+      <div class="template-card bg-white rounded-2xl overflow-hidden shadow-lg animate__animated animate__fadeInUp" data-template="healthcare" onclick="selectTemplate(this, 'Healthcare')">
+        <div class="aspect-[3/4] relative">
+          <img src="{{ url_for('static', filename='images/resumes/resume2.jpg') }}" 
+               alt="Healthcare Resume Template" 
+               class="w-full h-full object-cover">
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Action Area -->
+    <div class="glass-card rounded-3xl p-8 text-center animate__animated animate__fadeInUp">
+      <div id="selectionArea">
+        <div class="mb-6">
+          <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.121 2.122"/>
+          </svg>
+          <h3 class="text-2xl font-bold text-gray-700 mb-2">Select a Template</h3>
+          <p class="text-gray-600">Click on any template above to enhance your resume</p>
+        </div>
+      </div>
+
+      <div id="selectedTemplate" class="hidden">
+        <div class="mb-6">
+          <h3 class="text-2xl font-bold text-gray-800 mb-2">Template Selected!</h3>
+          <p class="text-gray-600 mb-4">Ready to enhance with <span id="selectedTemplateName" class="font-semibold text-blue-600"></span></p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <button onclick="enhanceResume()" class="modern-btn text-white px-8 py-4 rounded-xl font-semibold text-lg">
+              Enhance Resume
+              <svg class="w-5 h-5 inline-block ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedTemplate = null;
+    let uploadedFile = null;
+
+    // Get uploaded file from URL parameters
+    function getUrlParameter(name) {
+      name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+      const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+      const results = regex.exec(location.search);
+      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      uploadedFile = getUrlParameter('file');
+      if (uploadedFile) {
+        console.log('Processing file:', uploadedFile);
+      }
+      
+      // Store user session data for backend integration
+      const sessionData = {
+        uploadedFile: uploadedFile,
+        timestamp: new Date().toISOString(),
+        sessionId: generateSessionId()
+      };
+      
+      // Store in sessionStorage for backend integration
+      sessionStorage.setItem('resumeSession', JSON.stringify(sessionData));
+    });
+
+    // Generate session ID
+    function generateSessionId() {
+      return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    // Handle template selection
+    function selectTemplate(cardElement, templateName) {
+      // Remove previous selection
+      document.querySelectorAll('.template-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      
+      // Add selection to clicked card
+      cardElement.classList.add('selected');
+      
+      // Store selected template
+      selectedTemplate = {
+        id: cardElement.dataset.template,
+        name: templateName,
+        element: cardElement
+      };
+      
+      // Update UI
+      document.getElementById('selectionArea').classList.add('hidden');
+      document.getElementById('selectedTemplate').classList.remove('hidden');
+      document.getElementById('selectedTemplateName').textContent = selectedTemplate.name;
+      
+      // Store selection for backend integration
+      const sessionData = JSON.parse(sessionStorage.getItem('resumeSession') || '{}');
+      sessionData.selectedTemplate = selectedTemplate;
+      sessionStorage.setItem('resumeSession', JSON.stringify(sessionData));
+      
+      // Scroll to action area
+      document.getElementById('selectedTemplate').scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+    }
+
+    // Enhance resume with AI
+    function enhanceResume() {
+      if (!selectedTemplate) {
+        alert('Please select a template first.');
+        return;
+      }
+      
+      // Show loading overlay
+      const overlay = document.getElementById('loadingOverlay');
+      overlay.classList.add('active');
+      
+      // Simulate AI processing with progress bar
+      let progress = 0;
+      const progressBar = document.getElementById('progressBar');
+      
+      const interval = setInterval(() => {
+        progress += Math.random() * 15;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+          
+          // Store final data for backend
+          const sessionData = JSON.parse(sessionStorage.getItem('resumeSession') || '{}');
+          sessionData.processingComplete = true;
+          sessionData.completedAt = new Date().toISOString();
+          sessionStorage.setItem('resumeSession', JSON.stringify(sessionData));
+          
+          // Redirect to download page after processing
+          setTimeout(() => {
+            window.location.href = `./download.html?session=${sessionData.sessionId}`;
+          }, 1000);
+        }
+        progressBar.style.width = progress + '%';
+      }, 200);
+    }
+
+    // Add stagger animation to template cards
+    const cards = document.querySelectorAll('.template-card');
+    cards.forEach((card, index) => {
+      card.style.animationDelay = `${index * 0.1}s`;
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && selectedTemplate) {
+        // Clear selection
+        document.querySelectorAll('.template-card').forEach(card => {
+          card.classList.remove('selected');
+        });
+        selectedTemplate = null;
+        document.getElementById('selectionArea').classList.remove('hidden');
+        document.getElementById('selectedTemplate').classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+</html>
